@@ -21,7 +21,7 @@ useEffect(()=>{
 
 axios.get("http://localhost:8080/articles")
 .then(res=>{
-setArticles(res.data)
+setArticles(res.data || [])
 })
 
 },[])
@@ -35,6 +35,10 @@ Latest Articles
 </h1>
 
 <div className="grid gap-6">
+
+{articles.length === 0 && (
+<p className="text-gray-400">No articles yet</p>
+)}
 
 {articles.map((article:any)=>(
 

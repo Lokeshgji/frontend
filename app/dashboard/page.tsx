@@ -20,7 +20,7 @@ const router = useRouter()
 const [title,setTitle] = useState("")
 const [content,setContent] = useState("")
 const [loading,setLoading] = useState(false)
-const [slug, setSlug] = useState("")
+const [articles,setArticles] = useState<any[]>([])
 
 useEffect(()=>{
 
@@ -28,9 +28,26 @@ const token = localStorage.getItem("token")
 
 if(!token){
 router.push("/login")
+return
 }
 
+fetchArticles()
+
 },[])
+
+const fetchArticles = async () => {
+
+try{
+
+const res = await axios.get("http://localhost:8080/articles")
+
+setArticles(res.data || [])
+
+}catch(err){
+console.error(err)
+}
+
+}
 
 const createSlug = (title:string) => {
 
@@ -60,7 +77,8 @@ await axios.post(
   "http://localhost:8080/articles",
   {
     title,
-    content
+    content,
+    slug
   },
   {
      headers: {
@@ -74,7 +92,8 @@ alert("Article published")
 
 setTitle("")
 setContent("")
-setSlug("")
+
+fetchArticles()
 
 }catch(err: any){
 
@@ -92,6 +111,66 @@ err.message ||
 setLoading(false)
 
 }
+
+}
+
+const deleteArticle = async (id:number) => {
+
+const token = localStorage.getItem("token")
+
+if(!confirm("Delete this article?")) return
+
+try{
+
+await api.delete(`/articles/${id}`,{
+headers:{
+Authorization:`Bearer ${token}`
+}
+})
+
+alert("Article deleted")
+
+setArticles(prev => prev.filter((a:any)=>a.id !== id))
+
+}catch(err:any){
+
+alert(
+err?.response?.data?.error || "Delete failed"
+)
+
+}
+
+}
+
+const deleteAccount = async () => {
+
+  const token = localStorage.getItem("token")
+
+  if(!token){
+    alert("You are not logged in")
+    return
+  }
+
+  try{
+
+    await api.delete("/users/me",{
+      headers:{
+        Authorization:`Bearer ${token}`
+      }
+    })
+
+    localStorage.removeItem("token")
+    alert("Account deleted")
+
+    window.location.href="/"
+
+  }catch(err:any){
+
+    alert(
+      err?.response?.data?.error || "Delete failed"
+    )
+
+  }
 
 }
 
@@ -121,6 +200,40 @@ onClick={publishArticle}
 disabled={loading}
 >
 {loading ? "Publishing..." : "Publish Article"}
+</button>
+
+
+<h2 className="text-2xl font-bold mt-10 mb-4">
+Your Articles
+</h2>
+
+{articles.length === 0 && (
+<p className="text-gray-400">No articles yet</p>
+)}
+
+{articles.map((article:any)=>(
+<div
+key={article.id}
+className="border border-gray-700 p-4 mb-4 rounded"
+>
+
+<h3 className="text-xl">{article.title}</h3>
+
+<button
+onClick={()=>deleteArticle(article.id)}
+className="text-red-500 mt-2"
+>
+Delete
+</button>
+
+</div>
+))}
+
+<button
+onClick={deleteAccount}
+className="text-red-500 mt-10"
+>
+Delete Account
 </button>
 
 </div>
