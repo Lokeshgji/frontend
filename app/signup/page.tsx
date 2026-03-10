@@ -14,31 +14,9 @@ const [password,setPassword] = useState("")
 
 const signup = async () => {
 
-if(!name){
-    alert("Name is required")
-    return
-  }
-
-  if(!email){
-    alert("Email is required")
-    return
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-if(!emailRegex.test(email)){
-  alert("Invalid email format")
-  return
-}
-
-  if(!password){
-    alert("Password is required")
-    return
-  }
-
 try{
 
-await axios.post(
+const res = await axios.post(
 "http://localhost:8080/signup",
 {
 name,
@@ -47,17 +25,21 @@ password
 }
 )
 
-alert("Account created. Please login.")
+alert("Signup successful")
 
 router.push("/login")
 
-}catch(err: any){
+}catch(err:any){
 
-  console.error(err)
+if(err.response){
 
-  alert(
-    err?.response?.data?.error || "Signup failed"
-  )
+alert(err.response.data.error || "Signup failed")
+
+}else{
+
+alert("Network error")
+
+}
 
 }
 

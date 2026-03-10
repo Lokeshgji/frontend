@@ -5,8 +5,11 @@ import Link from "next/link"
 import api from "@/lib/api"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useSearchParams } from "next/navigation"
 
 function calculateReadTime(content:string){
+
+if(!content) return "1 min read"
 
 const words = content.split(" ").length
 const minutes = Math.ceil(words/200)
@@ -19,6 +22,9 @@ export default function Articles(){
 
 const [articles,setArticles] = useState<any[]>([])
 const [loading,setLoading] = useState(true)
+
+const searchParams = useSearchParams()
+const query = searchParams.get("q")
 
 useEffect(()=>{
 
@@ -42,27 +48,53 @@ fetchArticles()
 
 },[])
 
+
+/* Filter articles if search query exists */
+
+const filteredArticles = query
+? articles.filter((article:any)=>
+(article.title || "")
+.toLowerCase()
+.includes(query.toLowerCase())
+)
+: articles
+
+
 return(
 
 <div className="min-h-screen px-6 py-20">
 
 <div className="max-w-4xl mx-auto">
 
-<h1 className="text-5xl font-bold mb-10">
-Explore Articles
+<h1 className="text-5xl font-bold mb-6 text-white">
+{query ? `Search Results` : "Explore Articles"}
 </h1>
+
+{query && (
+<p className="text-gray-400 mb-8">
+Showing results for "{query}"
+</p>
+)}
 
 {loading && (
 <p className="text-gray-400">Loading articles...</p>
 )}
 
-{!loading && articles.length === 0 && (
-<p className="text-gray-400">No articles published yet</p>
+{!loading && filteredArticles.length === 0 && (
+
+<p className="text-gray-400">
+
+{query
+? `No articles found for "${query}"`
+: "No articles published yet"}
+
+</p>
+
 )}
 
 <div className="space-y-8">
 
-{articles.map((article:any)=>(
+{filteredArticles.map((article:any)=>(
 
 <Card
 key={article.id}
@@ -83,7 +115,7 @@ By {article.author_name || "Unknown"} • {calculateReadTime(article.content)}
 
 <p className="text-gray-300 mb-5">
 
-{article.content.slice(0,160)}...
+{(article.content || "").slice(0,160)}...
 
 </p>
 
