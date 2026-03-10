@@ -21,16 +21,18 @@ const [title,setTitle] = useState("")
 const [content,setContent] = useState("")
 const [loading,setLoading] = useState(false)
 const [articles,setArticles] = useState<any[]>([])
+const [checkingAuth,setCheckingAuth] = useState(true)
 
 useEffect(()=>{
 
 const token = localStorage.getItem("token")
 
 if(!token){
-router.push("/login")
-return
+  router.replace("/login")
+  return
 }
 
+setCheckingAuth(false)
 fetchArticles()
 
 },[])
@@ -144,46 +146,52 @@ err?.response?.data?.error || "Delete failed"
 
 const deleteAccount = async () => {
 
-  const token = localStorage.getItem("token")
+const token = localStorage.getItem("token")
 
-  if(!token){
-    alert("You are not logged in")
-    return
-  }
+if(!token){
+alert("You are not logged in")
+return
+}
 
-  try{
+try{
 
-    await api.delete("/users/me",{
-      headers:{
-        Authorization:`Bearer ${token}`
-      }
-    })
+await api.delete("/users/me",{
+headers:{
+Authorization:`Bearer ${token}`
+}
+})
 
-    localStorage.removeItem("token")
-    alert("Account deleted")
+localStorage.removeItem("token")
+alert("Account deleted")
 
-    window.location.href="/"
+window.location.href="/"
 
-  }catch(err:any){
+}catch(err:any){
 
-    alert(
-      err?.response?.data?.error || "Delete failed"
-    )
+alert(
+err?.response?.data?.error || "Delete failed"
+)
 
-  }
+}
 
+}
+
+/* Prevent dashboard flash before auth check */
+
+if(checkingAuth){
+return null
 }
 
 return(
 
-<div className="p-10 max-w-3xl mx-auto">
+<div className="px-6 py-20 max-w-4xl mx-auto">
 
-<h1 className="text-3xl font-bold mb-6">
+<h1 className="text-4xl font-bold mb-8 text-white">
 Write Article
 </h1>
 
 <input
-className="w-full p-3 mb-4 bg-gray-800 rounded text-white"
+className="w-full p-3 mb-4 bg-white/5 backdrop-blur border border-white/10 rounded text-white"
 placeholder="Article Title"
 value={title}
 onChange={e=>setTitle(e.target.value)}
@@ -195,7 +203,7 @@ onChange={setContent}
 />
 
 <button
-className="mt-6 bg-blue-600 px-6 py-3 rounded hover:bg-blue-700"
+className="mt-6 bg-indigo-600 px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
 onClick={publishArticle}
 disabled={loading}
 >
@@ -203,7 +211,7 @@ disabled={loading}
 </button>
 
 
-<h2 className="text-2xl font-bold mt-10 mb-4">
+<h2 className="text-3xl font-bold mt-16 mb-6 text-white">
 Your Articles
 </h2>
 
@@ -211,27 +219,31 @@ Your Articles
 <p className="text-gray-400">No articles yet</p>
 )}
 
+<div className="space-y-6">
+
 {articles.map((article:any)=>(
 
 <div
 key={article.id}
-className="border border-gray-700 p-4 mb-4 rounded"
+className="bg-white/5 backdrop-blur border border-white/10 p-6 rounded-lg hover:bg-white/10 transition"
 >
 
-<h3 className="text-xl">{article.title}</h3>
+<h3 className="text-xl font-semibold text-white">
+{article.title}
+</h3>
 
-<div className="flex gap-4 mt-3">
+<div className="flex gap-6 mt-4">
 
 <button
 onClick={()=>router.push(`/edit/${article.id}`)}
-className="text-blue-400"
+className="text-indigo-400 hover:text-indigo-300"
 >
 Edit
 </button>
 
 <button
 onClick={()=>deleteArticle(article.id)}
-className="text-red-500"
+className="text-red-400 hover:text-red-300"
 >
 Delete
 </button>
@@ -242,9 +254,11 @@ Delete
 
 ))}
 
+</div>
+
 <button
 onClick={deleteAccount}
-className="text-red-500 mt-10"
+className="text-red-500 mt-16 hover:text-red-400"
 >
 Delete Account
 </button>

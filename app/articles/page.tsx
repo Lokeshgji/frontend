@@ -1,15 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import api from "@/lib/api"
 import Link from "next/link"
+import api from "@/lib/api"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-function calculateReadTime(content: string){
+function calculateReadTime(content:string){
 
 const words = content.split(" ").length
-const minutes = Math.ceil(words / 200)
+const minutes = Math.ceil(words/200)
 
 return `${minutes} min read`
 
@@ -22,7 +22,7 @@ const [loading,setLoading] = useState(true)
 
 useEffect(()=>{
 
-const fetchArticles = async ()=>{
+const fetchArticles = async()=>{
 
 try{
 
@@ -44,10 +44,12 @@ fetchArticles()
 
 return(
 
-<div className="max-w-4xl mx-auto p-8">
+<div className="min-h-screen px-6 py-20">
 
-<h1 className="text-4xl font-bold mb-10">
-Latest Articles
+<div className="max-w-4xl mx-auto">
+
+<h1 className="text-5xl font-bold mb-10">
+Explore Articles
 </h1>
 
 {loading && (
@@ -55,27 +57,34 @@ Latest Articles
 )}
 
 {!loading && articles.length === 0 && (
-<p className="text-gray-400">No articles yet</p>
+<p className="text-gray-400">No articles published yet</p>
 )}
 
-<div className="space-y-6">
+<div className="space-y-8">
 
 {articles.map((article:any)=>(
 
-<Card key={article.id} className="hover:shadow-xl transition">
+<Card
+key={article.id}
+className="bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition duration-300"
+>
 
 <CardContent className="p-6">
 
-<h2 className="text-2xl font-semibold mb-2">
+<h2 className="text-2xl font-semibold mb-2 text-white hover:text-indigo-300 transition">
 {article.title}
 </h2>
 
-<p className="text-gray-400 text-sm mb-4">
+<p className="text-gray-400 text-sm mb-3">
+
 By {article.author_name || "Unknown"} • {calculateReadTime(article.content)}
+
 </p>
 
-<p className="text-gray-300 line-clamp-2 mb-4">
-{article.content.slice(0,150)}...
+<p className="text-gray-300 mb-5">
+
+{article.content.slice(0,160)}...
+
 </p>
 
 <Link href={`/article/${article.slug}`}>
@@ -91,6 +100,8 @@ Read Article
 </Card>
 
 ))}
+
+</div>
 
 </div>
 

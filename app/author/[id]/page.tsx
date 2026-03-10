@@ -5,6 +5,18 @@ import axios from "axios"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+
+function calculateReadTime(content?: string){
+
+if(!content) return "1 min read"
+
+const words = content.split(" ").length
+const minutes = Math.ceil(words / 200)
+
+return `${minutes} min read`
+
+}
 
 export default function AuthorPage(){
 
@@ -54,7 +66,11 @@ fetchData()
 },[id])
 
 if(loading){
-return <div className="p-10">Loading...</div>
+return (
+<div className="p-10 text-gray-400 text-center">
+Loading author...
+</div>
+)
 }
 
 if(error){
@@ -67,21 +83,27 @@ return (
 
 return(
 
-<div className="p-10 max-w-3xl mx-auto">
+<div className="max-w-4xl mx-auto px-6 py-20">
 
-<h1 className="text-3xl font-bold mb-2">
+{/* Author Header */}
+
+<div className="mb-12">
+
+<h1 className="text-4xl font-bold mb-2 text-white">
 {author.name}
 </h1>
 
-<p className="text-gray-400 mb-2">
+<p className="text-gray-400">
 {author.email}
 </p>
 
-<p className="text-gray-400 mb-6">
+<p className="text-gray-400 mt-2">
 {articles.length} Articles Published
 </p>
 
-<h2 className="text-xl mb-4">
+</div>
+
+<h2 className="text-2xl mb-6 text-white">
 Articles by {author.name}
 </h2>
 
@@ -91,31 +113,47 @@ No articles published yet
 </p>
 )}
 
-<div className="grid gap-4">
+<div className="space-y-8">
 
 {articles.map((article:any)=>(
-<Link
+
+<Card
 key={article.id}
-href={`/article/${article.slug}`}
+className="bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition duration-300"
 >
 
-<Card className="mb-4 hover:shadow-md transition">
+<CardContent className="p-6">
 
-<CardContent className="p-5">
+<h3 className="text-2xl font-semibold mb-2 text-white hover:text-indigo-300 transition">
 
-<h3 className="text-xl font-semibold text-gray-900">
 {article.title}
+
 </h3>
 
-<p className="text-gray-500 text-sm mt-1">
-Read article →
+<p className="text-gray-400 text-sm mb-3">
+
+{calculateReadTime(article.content)}
+
 </p>
+
+<p className="text-gray-300 mb-5">
+
+{(article.content || "").slice(0,160)}...
+
+</p>
+
+<Link href={`/article/${article.slug}`}>
+
+<Button variant="outline">
+Read Article
+</Button>
+
+</Link>
 
 </CardContent>
 
 </Card>
 
-</Link>
 ))}
 
 </div>
