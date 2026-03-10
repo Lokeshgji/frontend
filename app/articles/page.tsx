@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "@/lib/api"
 import Link from "next/link"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 function calculateReadTime(content: string){
 
@@ -15,51 +17,78 @@ return `${minutes} min read`
 
 export default function Articles(){
 
-const [articles,setArticles] = useState([])
+const [articles,setArticles] = useState<any[]>([])
+const [loading,setLoading] = useState(true)
 
 useEffect(()=>{
 
-axios.get("http://localhost:8080/articles")
-.then(res=>{
+const fetchArticles = async ()=>{
+
+try{
+
+const res = await api.get("/articles")
+
 setArticles(res.data || [])
-})
+
+}catch(err){
+console.error(err)
+}
+
+setLoading(false)
+
+}
+
+fetchArticles()
 
 },[])
 
 return(
 
-<div className="p-10">
+<div className="max-w-4xl mx-auto p-8">
 
-<h1 className="text-3xl font-bold mb-8">
+<h1 className="text-4xl font-bold mb-10">
 Latest Articles
 </h1>
 
-<div className="grid gap-6">
+{loading && (
+<p className="text-gray-400">Loading articles...</p>
+)}
 
-{articles.length === 0 && (
+{!loading && articles.length === 0 && (
 <p className="text-gray-400">No articles yet</p>
 )}
 
+<div className="space-y-6">
+
 {articles.map((article:any)=>(
 
-<Link
-key={article.id}
-href={`/article/${article.slug}`}
->
+<Card key={article.id} className="hover:shadow-xl transition">
 
-<div className="p-6 bg-gray-900 rounded hover:bg-gray-800">
+<CardContent className="p-6">
 
-<h2 className="text-xl font-bold mb-2">
+<h2 className="text-2xl font-semibold mb-2">
 {article.title}
 </h2>
 
-<p className="text-gray-400 text-sm">
-By {article.author_name} • {calculateReadTime(article.content)}
+<p className="text-gray-400 text-sm mb-4">
+By {article.author_name || "Unknown"} • {calculateReadTime(article.content)}
 </p>
 
-</div>
+<p className="text-gray-300 line-clamp-2 mb-4">
+{article.content.slice(0,150)}...
+</p>
+
+<Link href={`/article/${article.slug}`}>
+
+<Button variant="outline">
+Read Article
+</Button>
 
 </Link>
+
+</CardContent>
+
+</Card>
 
 ))}
 

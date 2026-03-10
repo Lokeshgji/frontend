@@ -1,63 +1,66 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
-export default function Navbar() {
+export default function Navbar(){
 
 const router = useRouter()
 const [loggedIn,setLoggedIn] = useState(false)
 
 useEffect(()=>{
-
-const checkLogin = () => {
 const token = localStorage.getItem("token")
 setLoggedIn(!!token)
-}
-
-checkLogin()
-
-window.addEventListener("storage",checkLogin)
-
-return () => window.removeEventListener("storage",checkLogin)
-
 },[])
 
 const logout = () => {
-
 localStorage.removeItem("token")
-
 setLoggedIn(false)
-
-router.push("/login")
-
+router.push("/")
 }
 
 return(
 
-<nav className="flex justify-between p-4 bg-gray-900 text-white">
+<nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-black/30">
 
-<Link href="/">
-<h1 className="font-bold text-xl cursor-pointer">
-Home
-</h1>
+<div className="flex items-center justify-between px-4 py-4 text-white">
+
+<Link href="/" className="text-2xl font-bold hover:text-indigo-300 transition">
+🚀 ValuableBlogs
 </Link>
 
-<div className="flex gap-4 items-center">
+<div className="flex items-center gap-6">
 
-<Link href="/articles">Articles</Link>
+<Link href="/articles" className="hover:text-indigo-300 transition">
+Explore
+</Link>
 
-{loggedIn && <Link href="/dashboard">Write</Link>}
+{loggedIn && (
+<Link href="/dashboard" className="hover:text-indigo-300 transition">
+Write
+</Link>
+)}
 
-{!loggedIn && <Link href="/login">Login</Link>}
+{!loggedIn && (
+<>
+<Link href="/login" className="hover:text-indigo-300 transition">
+Login
+</Link>
 
-{!loggedIn && <Link href="/signup">Signup</Link>}
+<Link
+href="/signup"
+className="bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+>
+Signup
+</Link>
+</>
+)}
 
 {loggedIn && (
 <button
 onClick={logout}
-className="bg-red-500 px-3 py-1 rounded"
+className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition"
 >
 Logout
 </button>
@@ -65,7 +68,10 @@ Logout
 
 </div>
 
+</div>
+
 </nav>
 
 )
+
 }

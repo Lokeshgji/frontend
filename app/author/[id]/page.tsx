@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function AuthorPage(){
 
@@ -92,23 +93,29 @@ No articles published yet
 
 <div className="grid gap-4">
 
-{articles.map(article => (
-
+{articles.map((article:any)=>(
 <Link
 key={article.id}
 href={`/article/${article.slug}`}
 >
 
-<div className="p-4 bg-gray-800 rounded hover:bg-gray-700">
+<Card className="mb-4 hover:shadow-md transition">
 
-<h3 className="text-lg font-semibold">
+<CardContent className="p-5">
+
+<h3 className="text-xl font-semibold text-gray-900">
 {article.title}
 </h3>
 
-</div>
+<p className="text-gray-500 text-sm mt-1">
+Read article →
+</p>
+
+</CardContent>
+
+</Card>
 
 </Link>
-
 ))}
 
 </div>

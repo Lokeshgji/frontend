@@ -43,9 +43,7 @@ return(
 </Link>
 
 <div className="prose prose-invert max-w-none">
-<ReactMarkdown remarkPlugins={[remarkGfm]}>
-{article.content}
-</ReactMarkdown>
+  <ReactMarkdown>{article.content}</ReactMarkdown>
 </div>
 
 </div>
